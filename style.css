@@ -1,0 +1,258 @@
+/* Color Palette & Variables */
+:root {
+    --bg-color: #1a1a1a;
+    --panel-bg: #2d2a26;
+    --text-main: #d9d2c5;
+    --text-muted: #8c857b;
+    --accent-color: #5c6653;
+    --border-color: #4a453f;
+
+    /* Dynamic Highlight Variables */
+    --mark-weight: bold;
+    --mark-style: normal;
+    --mark-bg: transparent;
+    --mark-text-color: inherit;
+}
+
+* {
+    box-sizing: border-width;
+    margin: 0;
+    padding: 0;
+    font-family: "Courier New", Courier, serif; /* Typewriter/Academic feel */
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-main);
+    display: flex;
+    justify-content: center;
+    padding: 40px 20px;
+}
+
+.main-container {
+    width: 100%;
+    max-width: 900px;
+}
+
+/* Header */
+header {
+    text-align: center;
+    margin-bottom: 40px;
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 20px;
+}
+
+header h1 {
+    font-size: 3rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-main);
+}
+
+header p {
+    color: var(--text-muted);
+    font-size: 1.1rem;
+}
+
+/* Header text block: keep the title group positioned normally, but align
+   the subtitle to the same left edge as the main title. */
+header > div {
+    text-align: left;
+}
+
+header p {
+    margin-top: 8px;
+}
+
+/* Search Panel & Filters */
+.search-panel {
+    background-color: var(--panel-bg);
+    border: 1px solid var(--border-color);
+    padding: 25px;
+    margin-bottom: 30px;
+}
+
+.primary-search {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+input[type="text"], select {
+    background-color: var(--bg-color);
+    color: var(--text-main);
+    border: 1px solid var(--border-color);
+    padding: 12px;
+    font-size: 1rem;
+    border-radius: 0; /* Hard, geometric edges */
+    outline: none;
+}
+
+input[type="text"]:focus, select:focus {
+    border-color: var(--accent-color);
+}
+
+#main-search {
+    flex-grow: 1;
+}
+
+button {
+    background-color: var(--bg-color);
+    color: var(--text-main);
+    border: 1px solid var(--border-color);
+    padding: 10px 20px;
+    cursor: pointer;
+    text-transform: uppercase;
+    font-weight: bold;
+    border-radius: 0;
+    transition: background-color 0.2s ease;
+}
+
+button:hover {
+    background-color: var(--accent-color);
+    color: #fff;
+}
+
+/* Advanced Filters Grid */
+.advanced-filters {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    border-top: 1px dashed var(--border-color);
+    padding-top: 20px;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.filter-group label {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+}
+
+/* Result Cards */
+.result-card {
+    background-color: var(--panel-bg);
+    border: 1px solid var(--border-color);
+    border-left: 5px solid var(--accent-color); /* Geometric accent line */
+    padding: 20px;
+    margin-bottom: 15px;
+}
+
+.result-meta {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-bottom: 15px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.result-text {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin-bottom: 20px;
+}
+
+.result-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.action-btn {
+    font-size: 0.8rem;
+    padding: 8px 12px;
+}
+
+/* Custom Highlighting Styling */
+/* Dynamic Highlighting Styling */
+/* Dynamic Highlighting Styling */
+mark {
+    background-color: var(--mark-bg, transparent) !important;
+    color: var(--mark-text-color, inherit) !important;
+    font-weight: var(--mark-weight, bold) !important;
+    font-style: var(--mark-style, normal) !important;
+    border-radius: 3px;
+    padding: 0 2px;
+    transition: background-color 0.1s ease, color 0.1s ease;
+}
+/* Override default browser blue colors */
+input[type="checkbox"],
+input[type="radio"],
+input[type="range"] {
+    accent-color: var(--accent-color);
+    /* Changes the checkbox/slider color */
+    cursor: pointer;
+}
+
+input:focus,
+select:focus,
+button:focus {
+    outline: 2px solid var(--accent-color) !important;
+    /* Kills the blue focus ring */
+    outline-offset: 2px;
+}
+
+/* Kills the blue background when you select text with your mouse */
+::selection {
+    background-color: var(--accent-color);
+    color: #fff;
+}
+
+/* Two-column layout for the checkboxes */
+.checkbox-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+/* Styling the collapsible sections */
+.collapsible-section {
+    margin-bottom: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    background: rgba(0, 0, 0, 0.2);
+}
+
+/* Styling the clickable dropdown header */
+.collapsible-section summary {
+    cursor: pointer;
+    padding: 10px 15px;
+    font-weight: bold;
+    color: var(--text-main);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    list-style: none;
+    /* Removes default triangle in some browsers */
+}
+
+/* Adding a custom '+' or '-' indicator to the dropdown */
+.collapsible-section summary::-webkit-details-marker {
+    display: none;
+    /* Hides default triangle in WebKit browsers */
+}
+
+.collapsible-section summary::before {
+    content: '+';
+    display: inline-block;
+    width: 20px;
+    color: var(--text-muted);
+}
+
+.collapsible-section[open] summary::before {
+    content: '-';
+}
+
+/* Spacing for the grid inside the dropdowns */
+.dropdown-grid {
+    padding: 10px 15px 15px 35px;
+    margin-bottom: 0;
+}
+
+#source-checkboxes label:hover {
+    text-decoration: underline;
+}

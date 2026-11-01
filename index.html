@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Harry Potter and the Ctrl+F</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Each JSON exchange remains one result card. Tweets within the
+           exchange appear on separate lines with a readable paragraph gap. */
+        .result-text .archive-record + .archive-record { margin-top: 1.1em; }
+        .result-text .archive-message {
+            margin: 0;
+            padding: 0;
+            line-height: 1.65;
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+        }
+        .result-text .archive-message + .archive-message { margin-top: 0.85em; }
+        .result-text .archive-tweet-exchange .archive-message + .archive-message {
+            padding-top: 0.15em;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="main-container">
+        <header style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+            <div>
+                <h1>Harry Potter and the Ctrl+F</h1>
+                <p>An unnecessarily searchable Wizarding World archive.</p>
+            </div>
+        </header>
+
+        <section class="search-panel">
+            <div class="primary-search">
+                <input type="text" id="main-search" placeholder="Search the archive...">
+                <button id="search-btn">Search</button>
+            </div>
+
+            <div class="advanced-filters">
+                <div class="filter-group" style="grid-column: span 2;">
+                    <label>Source Material:</label>
+                    <div
+                        style="margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                        <div>
+                            <button type="button" id="select-books-btn" class="action-btn"
+                                title="Select only the seven novels (excludes prequel, Fantastic Beasts and tweets)"
+                                style="font-size: 0.7rem; padding: 5px 10px;">Select 7 Books</button>
+                            <button type="button" id="check-all-btn" class="action-btn"
+                                style="font-size: 0.7rem; padding: 5px 10px;">Check All</button>
+                            <button type="button" id="uncheck-all-btn" class="action-btn"
+                                style="font-size: 0.7rem; padding: 5px 10px;">Uncheck All</button>
+                        </div>
+
+                        <!-- US / UK EDITION SWITCH BUTTON -->
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                            <span style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Book
+                                Edition:</span>
+                            <button type="button" id="edition-us-btn" class="action-btn"
+                                style="font-size: 0.75rem; padding: 5px 12px; background-color: var(--accent-color, #5c6653); color: #fff; font-weight: bold; cursor: pointer;">
+                                US Edition
+                            </button>
+                            <button type="button" id="edition-uk-btn" class="action-btn"
+                                style="font-size: 0.75rem; padding: 5px 12px; opacity: 0.65; cursor: pointer;">
+                                UK Edition
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="source-checkboxes">
+                        <!-- MAIN SERIES, FANTASTIC BEASTS & PREQUEL -->
+                        <div class="checkbox-grid" data-category="BOOKS & SCREENPLAYS">
+                            <!-- Seven main books; switch between US and UK editions -->
+                            <label><input type="checkbox" data-hp-slot="0" value="Sorcerer's Stone" checked> <span
+                                    class="hp-slot-label">SORCERER'S STONE</span></label>
+                            <label><input type="checkbox" data-hp-slot="1" value="Chamber of Secrets" checked> <span
+                                    class="hp-slot-label">CHAMBER OF SECRETS</span></label>
+                            <label><input type="checkbox" data-hp-slot="2" value="Prisoner of Azkaban" checked> <span
+                                    class="hp-slot-label">PRISONER OF AZKABAN</span></label>
+                            <label><input type="checkbox" data-hp-slot="3" value="Goblet of Fire" checked> <span
+                                    class="hp-slot-label">GOBLET OF FIRE</span></label>
+                            <label><input type="checkbox" data-hp-slot="4" value="Order of the Phoenix" checked> <span
+                                    class="hp-slot-label">ORDER OF THE PHOENIX</span></label>
+                            <label><input type="checkbox" data-hp-slot="5" value="Half-Blood Prince" checked> <span
+                                    class="hp-slot-label">HALF-BLOOD PRINCE</span></label>
+                            <label><input type="checkbox" data-hp-slot="6" value="Deathly Hallows" checked> <span
+                                    class="hp-slot-label">DEATHLY HALLOWS</span></label>
+
+                            <!-- The short-story prequel is an independent searchable source. -->
+                            <label><input type="checkbox" value="The Harry Potter Prequel" checked> <strong>THE HARRY POTTER PREQUEL</strong></label>
+
+                            <!-- Three Fantastic Beasts screenplays (shared between editions). -->
+                            <label><input type="checkbox" value="Fantastic Beasts" checked> FANTASTIC BEASTS 1</label>
+                            <label><input type="checkbox" value="The Crimes of Grindelwald" checked> CRIMES OF
+                                GRINDELWALD</label>
+                            <label><input type="checkbox" value="The Secrets of Dumbledore" checked> SECRETS OF
+                                DUMBLEDORE</label>
+                        </div>
+                        <!-- COLLAPSIBLE: J.K. ROWLING TWEETS -->
+                        <details class="collapsible-section">
+                            <summary>J.K. ROWLING TWEETS</summary>
+                            <div class="checkbox-grid dropdown-grid" data-category="J.K. ROWLING TWEETS">
+                                <label><input type="checkbox" value="Introduction" checked> INTRODUCTION</label>
+                                <label><input type="checkbox" value="#wizards4scotlandrugbyteam" checked>
+                                    #WIZARDS4SCOTLANDRUGBYTEAM</label>
+                                <label><input type="checkbox"
+                                        value="Random Questions - Houses, Voldemort, Dumbledore, and Patronuses"
+                                        checked> RANDOM QUESTIONS - HOUSES, VOLDEMORT, DUMBLEDORE, AND
+                                    PATRONUSES</label>
+                                <label><input type="checkbox" value="Fantastic Anagrams" checked> FANTASTIC
+                                    ANAGRAMS</label>
+                                <label><input type="checkbox" value="Religion/belief/non-belief systems at Hogwarts"
+                                        checked> RELIGION/BELIEF/NON-BELIEF SYSTEMS AT HOGWARTS</label>
+                                <label><input type="checkbox"
+                                        value="Random Questions - Horcruxes, Fluffy, Grimmauld Place, Unauthorized Documentaries, Death, Dogs, Dumbledore, and Ghosts not named after politicians"
+                                        checked> RANDOM QUESTIONS - HORCRUXES, FLUFFY, GRIMMAULD PLACE, UNAUTHORIZED
+                                    DOCUMENTARIES, DEATH, DOGS, DUMBLEDORE, AND GHOSTS NOT NAMED AFTER
+                                    POLITICIANS</label>
+                                <label><input type="checkbox" value="Wizarding Schools" checked> WIZARDING
+                                    SCHOOLS</label>
+                                <label><input type="checkbox" value="Cursed Child Announcement" checked> CURSED CHILD
+                                    ANNOUNCEMENT</label>
+                                <label><input type="checkbox" value="#NotAPrequel" checked> #NOTAPREQUEL</label>
+                                <label><input type="checkbox"
+                                        value="Random Questions - Aberforth, Credence, Birthdays, Hatstalls, Elvendork, Tuition, Teddy, Top Gear, Houses, Genetics, Government, TV adaptations, and Diagon Alley"
+                                        checked> RANDOM QUESTIONS - ABERFORTH, CREDENCE, BIRTHDAYS, HATSTALLS,
+                                    ELVENDORK, TUITION, TEDDY, TOP GEAR, HOUSES, GENETICS, GOVERNMENT, TV ADAPTATIONS,
+                                    AND DIAGON ALLEY</label>
+                                <label><input type="checkbox" value="Fantastic Beasts plot, tea leaves, and Hurcruxes"
+                                        checked> FANTASTIC BEASTS PLOT, TEA LEAVES, AND HURCRUXES</label>
+                                <label><input type="checkbox" value="Scottish Rugby" checked> SCOTTISH RUGBY</label>
+                                <label><input type="checkbox"
+                                        value="Random Questions - Cursed Child, Fan theories, Hagrid, Houses, and Catfights"
+                                        checked> RANDOM QUESTIONS - CURSED CHILD, FAN THEORIES, HAGRID, HOUSES, AND
+                                    CATFIGHTS</label>
+                                <label><input type="checkbox"
+                                        value="Random Questions - Crying, Divination, Magical Weddings, American Accents, Detentions, and whatev Row-Row"
+                                        checked> RANDOM QUESTIONS - CRYING, DIVINATION, MAGICAL WEDDINGS, AMERICAN
+                                    ACCENTS, DETENTIONS, AND WHATEV ROW-ROW</label>
+                                <label><input type="checkbox" value="Snape: Good, Evil or What?" checked> SNAPE: GOOD,
+                                    EVIL OR WHAT?</label>
+                                <label><input type="checkbox"
+                                        value="Random Questions - Puffskeins, Fantastic Beasts, Cursed Child, Black Hermione, Voldemort, Killing Hedwig, Wizarding Schools, Sorting, and Divination"
+                                        checked> RANDOM QUESTIONS - PUFFSKEINS, FANTASTIC BEASTS, CURSED CHILD, BLACK
+                                    HERMIONE, VOLDEMORT, KILLING HEDWIG, WIZARDING SCHOOLS, SORTING, AND
+                                    DIVINATION</label>
+                                <label><input type="checkbox" value="A History of Magic in North America" checked> A
+                                    HISTORY OF MAGIC IN NORTH AMERICA</label>
+                                <label><input type="checkbox"
+                                        value="Random Questions - Fantastic Beasts, Rejection Letters, Boggart quiz, Real Fantastic Beasts, Curses, Cursed Child tours, Battle of Hogwarts anniversary, Fawkes isn't a Hurcrux, and Expecto Patronum tattoos"
+                                        checked> RANDOM QUESTIONS - FANTASTIC BEASTS, REJECTION LETTERS, BOGGART QUIZ,
+                                    REAL FANTASTIC BEASTS, CURSES, CURSED CHILD TOURS, BATTLE OF HOGWARTS ANNIVERSARY,
+                                    FAWKES ISN'T A HURCRUX, AND EXPECTO PATRONUM TATTOOS</label>
+                                <label><input type="checkbox" value="#KeepTheSecrets" checked> #KEEPTHESECRETS</label>
+                                <label><input type="checkbox"
+                                        value="Random Questions - Brexit, Running for parliament, Ilvermorny sorting, Dumbledore trashing Hogwarts, Cursed Child opening, Voldemort, Gary, and flippant twitter bios"
+                                        checked> RANDOM QUESTIONS - BREXIT, RUNNING FOR PARLIAMENT, ILVERMORNY SORTING,
+                                    DUMBLEDORE TRASHING HOGWARTS, CURSED CHILD OPENING, VOLDEMORT, GARY, AND FLIPPANT
+                                    TWITTER BIOS</label>
+                                <label><input type="checkbox" value="Patronus Test launch" checked> PATRONUS TEST
+                                    LAUNCH</label>
+                                <label><input type="checkbox"
+                                        value="Random Questions - Fallen Hippogrifs, houses, swapping Patronuses, giant spiders, and lovable monsters"
+                                        checked> RANDOM QUESTIONS - FALLEN HIPPOGRIFS, HOUSES, SWAPPING PATRONUSES,
+                                    GIANT SPIDERS, AND LOVABLE MONSTERS</label>
+                                <label><input type="checkbox" value="Five movies" checked> FIVE MOVIES</label>
+                                <label><input type="checkbox" value="Fantastic Beast Premiere" checked> FANTASTIC BEAST
+                                    PREMIERE</label>
+                                <label><input type="checkbox" value="Fantastic Beasts Release" checked> FANTASTIC BEASTS
+                                    RELEASE</label>
+                                <label><input type="checkbox"
+                                        value="Random Questions - Mooncalfs, New books, Newt's travelling methods, canon, sequels, fanart, shiping, Ilvermorny houses, and Legimency"
+                                        checked> RANDOM QUESTIONS - MOONCALFS, NEW BOOKS, NEWT'S TRAVELLING METHODS,
+                                    CANON, SEQUELS, FANART, SHIPING, ILVERMORNY HOUSES, AND LEGIMENCY</label>
+                            </div>
+                        </details>
+                    </div>
+                </div>
+                <div class="filter-group">
+                    <label for="search-scope">Paragraph Proximity (Search Volume):</label>
+                    <select id="search-scope">
+                        <option value="1">Within a Single Paragraph</option>
+                        <option value="2">Within 2 Neighboring Paragraphs</option>
+                        <option value="3">Within 3 Neighboring Paragraphs</option>
+                        <option value="5">Within 5 Neighboring Paragraphs</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="search-mode">Multiple Words Logic:</label>
+                    <select id="search-mode">
+                        <option value="and">Match ALL words (AND)</option>
+                        <option value="or">Match ANY word (OR)</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="exact-phrase">Exact Sequence:</label>
+                    <input type="text" id="exact-phrase" placeholder="e.g., 'I open at the close'">
+                </div>
+
+                <div class="filter-group">
+                    <label for="without-word">Without the word:</label>
+                    <input type="text" id="without-word" placeholder="e.g., 'Snape'">
+                </div>
+
+                <div class="filter-group" style="grid-column: span 2;">
+                    <label
+                        style="display:flex; align-items:center; gap:10px; cursor:pointer; color:var(--text-main); font-size:0.95rem; text-transform:none; margin-top: 10px;">
+                        <input type="checkbox" id="exact-word-toggle" style="width: 18px; height: 18px;">
+                        <strong>Strict Word Matching</strong> (Search exact words only. e.g., "fin" will NOT match
+                        "finish")
+                    </label>
+                </div>
+            </div>
+            <div class="highlight-controls"
+                style="margin-top: 20px; border-top: 1px dashed var(--border-color); padding-top: 20px; display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 15px;">
+                <div class="filter-group">
+                    <label style="display:flex; align-items:center; gap:8px; cursor:pointer; color:var(--text-main);">
+                        <input type="checkbox" id="mark-bold" checked style="width:16px; height:16px;"> Bold
+                    </label>
+                </div>
+
+                <div class="filter-group">
+                    <label style="display:flex; align-items:center; gap:8px; cursor:pointer; color:var(--text-main);">
+                        <input type="checkbox" id="mark-italic" style="width:16px; height:16px;"> Italic
+                    </label>
+                </div>
+
+                <div class="filter-group">
+                    <label for="mark-color">Highlight Color:</label>
+                    <input type="color" id="mark-color" value="#5c6653"
+                        style="width:100%; height:30px; cursor:pointer; padding:0; border:1px solid var(--border-color);">
+                </div>
+
+                <div class="filter-group">
+                    <label for="mark-opacity">Opacity (0 to 1):</label>
+                    <input type="range" id="mark-opacity" min="0" max="1" step="0.1" value="0"
+                        style="width:100%; cursor:pointer;">
+                </div>
+            </div>
+        </section>
+
+        <section class="results-panel">
+            <div class="result-card">
+                <div class="result-meta">
+                    <span class="book-title">Sorcerer's Stone</span> |
+                    <span class="chapter-title">CHAPTER ONE</span> |
+                    <span class="page-num">Page 12</span>
+                </div>
+                <div class="result-text">
+                    Mr. and Mrs. Dursley, of number four, Privet Drive, were proud to say that they were perfectly
+                    normal, thank you very much.
+                </div>
+                <div class="result-actions">
+                    <button class="action-btn">Expand Quote</button>
+                    <button class="action-btn">Open in Book</button>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
