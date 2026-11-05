@@ -178,11 +178,25 @@ function decorateSourceLabelsForPdfLinks() {
         const cb = label.querySelector('input[type="checkbox"]');
         if (!cb) return;
         const pdf = pdfFiles[cb.value];
+        let link = label.querySelector('.source-pdf-link');
         if (pdf) {
             label.title = `Click name to open ${pdf} (Click checkbox to toggle selection)`;
             label.style.cursor = 'pointer';
+            // Mobile labels select sources; a separate accessible link opens the PDF.
+            if (!link) {
+                link = document.createElement('a');
+                link.className = 'source-pdf-link';
+                link.textContent = 'PDF ↗';
+                link.target = '_blank';
+                link.rel = 'noopener noreferrer';
+                link.setAttribute('aria-label', `Open PDF for ${cb.value}`);
+                label.appendChild(link);
+            }
+            link.href = `${encodeURI(pdf)}#page=${bookStartPages[cb.value] || 1}`;
+            link.setAttribute('aria-label', `Open PDF for ${cb.value}`);
         } else {
             label.title = 'No PDF file linked yet';
+            if (link) link.remove();
         }
     });
 }
@@ -206,6 +220,34 @@ const uncheckAllBtn = document.getElementById('uncheck-all-btn');
 const editionUsBtn = document.getElementById('edition-us-btn');
 const editionUkBtn = document.getElementById('edition-uk-btn');
 
+// Compact, independently collapsible source and filter panels on narrow screens.
+const mobileSourcesBtn = document.getElementById('mobile-sources-btn');
+const mobileFiltersBtn = document.getElementById('mobile-filters-btn');
+const sourcePicker = document.querySelector('.source-picker');
+const advancedFilters = document.getElementById('advanced-filters');
+const searchPanel = document.querySelector('.search-panel');
+
+function updateMobileSourceCount() {
+    const total = document.querySelectorAll('#source-checkboxes input[type="checkbox"]:checked').length;
+    const badge = document.getElementById('mobile-source-count');
+    if (badge) badge.textContent = String(total);
+    if (mobileSourcesBtn) mobileSourcesBtn.setAttribute('aria-label', `Sources: ${total} selected. Toggle source selection`);
+}
+if (mobileSourcesBtn && sourcePicker) {
+    mobileSourcesBtn.addEventListener('click', () => {
+        const open = sourcePicker.classList.toggle('mobile-source-open');
+        mobileSourcesBtn.setAttribute('aria-expanded', String(open));
+    });
+}
+if (mobileFiltersBtn && advancedFilters && searchPanel) {
+    mobileFiltersBtn.addEventListener('click', () => {
+        const open = advancedFilters.classList.toggle('mobile-advanced-open');
+        searchPanel.classList.toggle('mobile-advanced-open', open);
+        mobileFiltersBtn.setAttribute('aria-expanded', String(open));
+    });
+}
+updateMobileSourceCount();
+
 // US / UK Edition Switcher Logic
 function switchBookEdition(edition) {
     currentEdition = edition;
@@ -222,6 +264,7 @@ function switchBookEdition(edition) {
     });
 
     decorateSourceLabelsForPdfLinks();
+    updateMobileSourceCount();
 
     if (editionUsBtn && editionUkBtn) {
         if (edition === 'US') {
@@ -265,13 +308,16 @@ selectBooksBtn.addEventListener('click', () => {
     document.querySelectorAll('#source-checkboxes input[type="checkbox"]').forEach(cb => {
         cb.checked = cb.hasAttribute('data-hp-slot');
     });
+    updateMobileSourceCount();
 });
 
 checkAllBtn.addEventListener('click', () => {
     document.querySelectorAll('#source-checkboxes input[type="checkbox"]').forEach(cb => cb.checked = true);
+    updateMobileSourceCount();
 });
 uncheckAllBtn.addEventListener('click', () => {
     document.querySelectorAll('#source-checkboxes input[type="checkbox"]').forEach(cb => cb.checked = false);
+    updateMobileSourceCount();
 });
 
 // Checkbox Drag-to-Toggle + Click-Source-Name-to-Open-PDF Logic
@@ -282,10 +328,11 @@ let handledByDragMouse = false;
 
 if (sourceCheckboxesContainer) {
     sourceCheckboxesContainer.style.userSelect = 'none';
+    sourceCheckboxesContainer.addEventListener('change', updateMobileSourceCount);
 
     // 1. Mousedown on the CHECKBOX SQUARE starts drag-to-check / uncheck
     sourceCheckboxesContainer.addEventListener('mousedown', (e) => {
-        if (e.button !== 0) return;
+        if (e.button !== 0 || window.matchMedia('(pointer: coarse)').matches) return;
 
         // Only start checkbox toggling if the user clicked the actual checkbox input
         if (e.target.matches('input[type="checkbox"]')) {
@@ -294,6 +341,7 @@ if (sourceCheckboxesContainer) {
             handledByDragMouse = true;
             dragTargetState = !checkbox.checked;
             checkbox.checked = dragTargetState;
+            updateMobileSourceCount();
             e.preventDefault();
         }
     });
@@ -307,6 +355,7 @@ if (sourceCheckboxesContainer) {
         const checkbox = label.querySelector('input[type="checkbox"]');
         if (checkbox) {
             checkbox.checked = dragTargetState;
+            updateMobileSourceCount();
         }
     });
 
@@ -314,6 +363,8 @@ if (sourceCheckboxesContainer) {
     //    - If clicking the checkbox square: prevent double-toggle from mousedown
     //    - If clicking the SOURCE NAME text: prevent checkbox toggle and open the PDF!
     sourceCheckboxesContainer.addEventListener('click', (e) => {
+        // The dedicated PDF link never toggles the enclosing checkbox label.
+        if (e.target.closest('.source-pdf-link')) return;
         const label = e.target.closest('label');
         if (!label || !sourceCheckboxesContainer.contains(label)) return;
 
@@ -325,7 +376,19 @@ if (sourceCheckboxesContainer) {
             return;
         }
 
-        // User clicked on the source text/name, NOT the checkbox square
+        // On narrow/touch devices the entire label is a generous selection target.
+        // PDF navigation remains available through its small separate link.
+        if (window.matchMedia('(max-width: 760px), (pointer: coarse)').matches) {
+            e.preventDefault();
+            const checkbox = label.querySelector('input[type="checkbox"]');
+            if (checkbox) {
+                checkbox.checked = !checkbox.checked;
+                updateMobileSourceCount();
+            }
+            return;
+        }
+
+        // Desktop keeps the existing click-title-to-open-PDF behaviour.
         e.preventDefault(); // Stop <label> from toggling the checkbox
 
         const checkbox = label.querySelector('input[type="checkbox"]');
@@ -592,21 +655,21 @@ function displayResults(results, query, exact, isExactMatch) {
             const pageNum = Number.isInteger(validPage) && validPage > 0 ? validPage : 1;
             const pdfUrl = `${fileName}#page=${pageNum}&search=${encodeURIComponent(searchTerm)}`;
 
-            pdfButtonHTML = `<a href="${pdfUrl}" target="_blank" class="action-btn" style="text-decoration: none; display: inline-block; background-color: var(--accent-color); color: #fff; margin-left: 10px; padding: 5px 10px;">Open in PDF</a>`;
+            pdfButtonHTML = `<a href="${encodeURI(fileName)}#page=${pageNum}&search=${encodeURIComponent(searchTerm)}" target="_blank" rel="noopener noreferrer" class="action-btn pdf-action" style="background-color: var(--accent-color); color: #fff;"><span class="desktop-label">Open in PDF</span><span class="mobile-label">PDF ↗</span></a>`;
         }
 
         card.innerHTML = `
             <div class="result-meta">
-                <span class="book-title">${result.book}</span> | 
-                <span class="chapter-title">${result.chapter}</span> | 
-                <span class="page-num">Page ${result.page_number}</span>
+                <span class="book-title">${escapeResultText(result.book)}</span><span class="meta-separator" aria-hidden="true">|</span>
+                <span class="chapter-title">${escapeResultText(result.chapter || '')}</span><span class="meta-separator" aria-hidden="true">|</span>
+                <span class="page-num">Page ${escapeResultText(result.page_number)}</span>
             </div>
             <div class="result-text" id="text-block-${index}">
                 ${highlightedHTML}
             </div>
             <div class="result-actions">
-                <button class="action-btn expand-back-btn" data-block-id="${index}" data-start="${result.startIndex}" data-end="${result.endIndex}">Expand Backward</button>
-                <button class="action-btn expand-fwd-btn" data-block-id="${index}" data-start="${result.startIndex}" data-end="${result.endIndex}">Expand Forward</button>
+                <button class="action-btn expand-back-btn" data-block-id="${index}" data-start="${result.startIndex}" data-end="${result.endIndex}" aria-label="Expand backward"><span class="desktop-label">Expand Backward</span><span class="mobile-label">← Back</span></button>
+                <button class="action-btn expand-fwd-btn" data-block-id="${index}" data-start="${result.startIndex}" data-end="${result.endIndex}" aria-label="Expand forward"><span class="desktop-label">Expand Forward</span><span class="mobile-label">Next →</span></button>
                 ${pdfButtonHTML}
             </div>
         `;

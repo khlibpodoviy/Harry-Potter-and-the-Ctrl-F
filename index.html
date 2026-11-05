@@ -34,42 +34,52 @@
             </div>
         </header>
 
-        <section class="search-panel">
+        <section class="search-panel" aria-label="Archive search">
             <div class="primary-search">
-                <input type="text" id="main-search" placeholder="Search the archive...">
+                <input type="search" id="main-search" placeholder="Search the archive..." aria-label="Search the archive" autocomplete="off">
                 <button id="search-btn">Search</button>
             </div>
 
-            <div class="advanced-filters">
-                <div class="filter-group" style="grid-column: span 2;">
-                    <label>Source Material:</label>
-                    <div
-                        style="margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
-                        <div>
+            <div class="mobile-quick-controls" aria-label="Search options">
+                <button type="button" id="mobile-sources-btn" class="mobile-toggle" aria-controls="source-picker-content" aria-expanded="false">
+                    <span>Sources <span id="mobile-source-count" class="source-count">11</span></span><span class="mobile-toggle-chevron" aria-hidden="true">▾</span>
+                </button>
+                <button type="button" id="mobile-filters-btn" class="mobile-toggle" aria-controls="advanced-filters" aria-expanded="false">
+                    <span>More filters</span><span class="mobile-toggle-chevron" aria-hidden="true">▾</span>
+                </button>
+            </div>
+
+            <div class="advanced-filters" id="advanced-filters">
+                <div class="filter-group source-picker" style="grid-column: span 2;">
+                    <label class="section-label">Source Material:</label>
+                    <div class="source-picker-content" id="source-picker-content">
+                    <div class="source-toolbar">
+                        <div class="source-bulk-actions">
                             <button type="button" id="select-books-btn" class="action-btn"
                                 title="Select only the seven novels (excludes prequel, Fantastic Beasts and tweets)"
-                                style="font-size: 0.7rem; padding: 5px 10px;">Select 7 Books</button>
+                                >Select 7 Books</button>
                             <button type="button" id="check-all-btn" class="action-btn"
-                                style="font-size: 0.7rem; padding: 5px 10px;">Check All</button>
+                                >Check All</button>
                             <button type="button" id="uncheck-all-btn" class="action-btn"
-                                style="font-size: 0.7rem; padding: 5px 10px;">Uncheck All</button>
+                                >Uncheck All</button>
                         </div>
 
                         <!-- US / UK EDITION SWITCH BUTTON -->
-                        <div style="display: flex; align-items: center; gap: 6px;">
+                        <div class="edition-selector">
                             <span style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Book
                                 Edition:</span>
                             <button type="button" id="edition-us-btn" class="action-btn"
-                                style="font-size: 0.75rem; padding: 5px 12px; background-color: var(--accent-color, #5c6653); color: #fff; font-weight: bold; cursor: pointer;">
+                                >
                                 US Edition
                             </button>
                             <button type="button" id="edition-uk-btn" class="action-btn"
-                                style="font-size: 0.75rem; padding: 5px 12px; opacity: 0.65; cursor: pointer;">
+                                >
                                 UK Edition
                             </button>
                         </div>
                     </div>
 
+                    <p class="mobile-source-hint">Tap a title to select it, or <strong>PDF ↗</strong> to open its book.</p>
                     <div id="source-checkboxes">
                         <!-- MAIN SERIES, FANTASTIC BEASTS & PREQUEL -->
                         <div class="checkbox-grid" data-category="BOOKS & SCREENPLAYS">
@@ -178,6 +188,7 @@
                             </div>
                         </details>
                     </div>
+                    </div><!-- /source-picker-content -->
                 </div>
                 <div class="filter-group">
                     <label for="search-scope">Paragraph Proximity (Search Volume):</label>
